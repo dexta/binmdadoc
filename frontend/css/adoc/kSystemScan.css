@@ -1,0 +1,649 @@
+/* =============================================================================
+   SysScan — Terminal/CRT-Theme für Asciidoctor HTML5-Output
+   Farben & Look aus dem Original-Stylesheet, Selektoren auf die Elemente
+   angepasst, die `asciidoctor input.adoc -o output.html` tatsächlich erzeugt.
+
+   Verwendung:
+     asciidoctor -a stylesheet=SysScan.css -a linkcss input.adoc   # verlinkt
+     asciidoctor -a stylesheet=SysScan.css input.adoc              # eingebettet
+
+   Oder im Dokumentkopf:
+     :stylesheet: SysScan.css
+     :stylesdir: css
+     :linkcss:
+
+   Keine externen Fonts/CDNs — läuft komplett offline.
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   1. Tokens
+   -------------------------------------------------------------------------- */
+:root {
+    --bg-color: #050b08;
+    --text-color:#33ff66;
+    --term-green: #33ff66;
+    --term-dim: #116633;
+    --term-cyan: #00ffff;
+    --term-warn: #ff3333;
+    --link-color: #ff3333;
+    --term-amber: #ffb000;
+    --font-stack: 'Courier New', Courier, monospace;
+    --font-main: 'Courier New', Courier, monospace;
+
+    --panel-bg: rgba(5, 15, 10, 0.85);
+    --code-bg: rgba(5, 15, 10, 0.85);
+    --panel-bg-soft: rgba(0, 20, 10, 0.5);
+    --panel-bg-solid: #080f0c;
+    --bar-bg: #111;
+    --glow: 0 0 4px rgba(51, 255, 102, 0.6);
+    --content-width: 900px;
+}
+
+/* -----------------------------------------------------------------------------
+   2. Reset & Basis
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    background-color: var(--bg-color);
+    color: var(--term-green);
+    font-family: var(--font-stack);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    text-shadow: var(--glow);
+    padding-bottom: 40px;
+}
+
+/* CRT-Scanlines: fixed statt absolute, damit sie beim Scrollen stehen bleiben */
+body::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 3px, 3px 100%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+::selection { background: var(--term-green); color: var(--bg-color); text-shadow: none; }
+
+/* Scrollbars */
+* { scrollbar-color: var(--term-dim) var(--bg-color); scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: var(--term-dim); border: 1px solid var(--bg-color); }
+::-webkit-scrollbar-thumb:hover { background: var(--term-green); }
+
+/* -----------------------------------------------------------------------------
+   3. Layout: #header / #content / #footnotes / #footer
+   -------------------------------------------------------------------------- */
+#header {
+    background: var(--bar-bg);
+    border-bottom: 2px solid var(--term-green);
+    padding: 10px 20px 14px;
+    margin-bottom: 26px;
+    position: relative;
+    z-index: 2;
+}
+#header > * {
+    max-width: var(--content-width);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#content,
+#footnotes,
+#footer > * {
+    max-width: var(--content-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Dokumenttitel (= alte .sys-title) */
+#header > h1,
+body > h1:first-child {
+    color: var(--term-cyan);
+    font-size: 1.4rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(0, 255, 255, 0.5);
+}
+#header > h1::before { content: "// "; color: var(--term-dim); }
+
+/* Autor / Version / Datum (= alte .hud-stats / .stat-item) */
+#header .details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--term-green);
+}
+#header .details br { display: none; }
+#header .details > span {
+    border: 1px solid var(--term-dim);
+    background: var(--panel-bg-soft);
+    padding: 2px 8px;
+}
+#header .details #author { color: var(--term-cyan); }
+
+#footer {
+    border-top: 1px solid var(--term-dim);
+    background: var(--panel-bg-solid);
+    margin-top: 40px;
+    padding: 10px 0;
+    font-size: 0.8rem;
+    color: var(--term-dim);
+    text-shadow: none;
+}
+
+/* -----------------------------------------------------------------------------
+   4. Inhaltsverzeichnis (:toc:, :toc: left|right)
+   -------------------------------------------------------------------------- */
+#toc {
+    border: 1px solid var(--term-dim);
+    background: var(--panel-bg-soft);
+    padding: 12px 16px;
+    margin-top: 16px;
+}
+#toctitle {
+    color: var(--term-cyan);
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 1px dashed var(--term-dim);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+}
+#toc ul { list-style: none; margin: 0; padding: 0; }
+#toc ul ul { margin-left: 18px; }
+#toc li { margin-bottom: 4px; font-size: 0.9rem; }
+#toc a { color: var(--term-green); border: 0; text-decoration: none; }
+#toc a::before { content: "> "; color: var(--term-dim); }
+#toc a:hover { color: var(--term-cyan); text-shadow: 0 0 6px rgba(0, 255, 255, 0.5); }
+#toc .sectlevel2 a, #toc .sectlevel3 a { color: var(--term-dim); }
+#toc .sectlevel2 a:hover, #toc .sectlevel3 a:hover { color: var(--term-cyan); }
+
+@media screen and (min-width: 1100px) {
+    body.toc2 { padding-left: 300px; }
+    body.toc2.toc-right { padding-left: 0; padding-right: 300px; }
+    #toc.toc2 {
+        position: fixed;
+        top: 0; left: 0;
+        width: 280px;
+        height: 100%;
+        margin: 0;
+        overflow-y: auto;
+        border: 0;
+        border-right: 1px solid var(--term-green);
+        background: var(--panel-bg-solid);
+        z-index: 15;
+    }
+    body.toc-right #toc.toc2 { left: auto; right: 0; border-right: 0; border-left: 1px solid var(--term-green); }
+}
+
+/* -----------------------------------------------------------------------------
+   5. Sektionen (= alte .node-card / .node-title)
+   -------------------------------------------------------------------------- */
+#preamble > .sectionbody,
+.sect1 {
+    border: 1px solid var(--term-dim);
+    background: var(--panel-bg);
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.1);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.sect2, .sect3, .sect4, .sect5 { margin: 18px 0 0 0; }
+.sect2 { padding-left: 14px; border-left: 1px dashed var(--term-dim); }
+
+h1, h2, h3, h4, h5, h6 { color: var(--term-cyan); font-weight: bold; line-height: 1.3; }
+
+.sect1 > h2, h2.sect0, .sect0 > h1 {
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px dashed var(--term-dim);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+}
+h3 { font-size: 1.1rem; margin: 20px 0 10px; border-bottom: 1px solid var(--term-dim); padding-bottom: 5px; }
+h4 { font-size: 1rem;    margin: 18px 0 8px; }
+h5, h6 { font-size: 0.95rem; margin: 16px 0 8px; color: var(--term-amber); }
+
+/* Kapitelnummern etc. dezent */
+.sect1 > h2 .anchor, h3 .anchor, h4 .anchor, h5 .anchor, h6 .anchor { font-weight: normal; }
+
+/* Selbstlink am Heading (nur beim Hover sichtbar) */
+h1 > a.anchor, h2 > a.anchor, h3 > a.anchor,
+h4 > a.anchor, h5 > a.anchor, h6 > a.anchor {
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+    color: var(--term-dim);
+    border: 0;
+    opacity: 0;
+    text-shadow: none;
+    transition: opacity 0.15s ease;
+}
+a.anchor::before { content: "#"; }
+h1:hover > a.anchor, h2:hover > a.anchor, h3:hover > a.anchor,
+h4:hover > a.anchor, h5:hover > a.anchor, h6:hover > a.anchor { opacity: 1; }
+
+/* Diskrete Überschriften (role=discrete) */
+.discrete { border-bottom: 0 !important; color: var(--term-amber); }
+
+/* -----------------------------------------------------------------------------
+   6. Absätze & Inline-Formatierung
+   -------------------------------------------------------------------------- */
+.paragraph, .ulist, .olist, .dlist, .qlist, .colist,
+.listingblock, .literalblock, .admonitionblock, .quoteblock,
+.verseblock, .sidebarblock, .exampleblock, .openblock,
+.imageblock, .videoblock, .audioblock, .tableblock, table.tableblock {
+    margin-bottom: 18px;
+}
+
+p { margin-bottom: 12px; }
+p:last-child { margin-bottom: 0; }
+
+#preamble .paragraph:first-of-type > p,
+.paragraph.lead > p {
+    font-size: 1.08rem;
+    color: var(--term-cyan);
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.35);
+}
+
+strong, b { color: var(--term-cyan); font-weight: normal; text-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
+em, i { color: var(--term-amber); font-style: italic; }
+mark, .mark { background: var(--term-green); color: var(--bg-color); text-shadow: none; padding: 0 3px; }
+del, .line-through { text-decoration: line-through; color: var(--term-dim); }
+.underline { text-decoration: underline; }
+.overline { text-decoration: overline; }
+.small { font-size: 0.85em; }
+.big { font-size: 1.15em; }
+sup, sub { font-size: 0.7em; }
+
+a {
+    color: var(--term-amber);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--term-amber);
+}
+a:hover, a:focus {
+    color: var(--term-cyan);
+    border-bottom-color: var(--term-cyan);
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+    outline: none;
+}
+a.bare { border-bottom-style: dashed; }
+
+code, .literal {
+    background: rgba(0, 255, 102, 0.1);
+    color: var(--term-green);
+    font-family: var(--font-stack);
+    font-size: 0.95em;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+/* kbd:[] und btn:[] (= alte .choice-key / .choice-btn) */
+kbd {
+    background: var(--term-dim);
+    color: var(--term-green);
+    font-family: var(--font-stack);
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 2px;
+    text-shadow: none;
+    white-space: nowrap;
+}
+.keyseq { color: var(--term-green); }
+b.button {
+    display: inline-block;
+    background: rgba(0, 30, 15, 0.6);
+    border: 1px solid var(--term-green);
+    color: var(--term-green);
+    font-weight: normal;
+    padding: 2px 10px;
+    text-shadow: none;
+}
+.menuseq, .menu, .submenu, .menuitem { color: var(--term-cyan); font-weight: normal; }
+
+hr { border: 0; border-top: 1px dashed var(--term-dim); margin: 24px 0; }
+
+/* Rollen-Farben (z. B. [.red]#Text#) */
+.aqua, .teal { color: var(--term-cyan); }
+.red, .maroon { color: var(--term-warn); }
+.yellow, .olive { color: var(--term-amber); }
+.lime, .green { color: var(--term-green); }
+.silver, .gray, .grey { color: var(--term-dim); }
+
+/* -----------------------------------------------------------------------------
+   7. Blocktitel (.title) — gilt für Listings, Bilder, Tabellen, Beispiele …
+   -------------------------------------------------------------------------- */
+.title {
+    color: var(--term-cyan);
+    font-size: 0.85rem;
+    font-weight: normal;
+    font-style: normal;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+/* -----------------------------------------------------------------------------
+   8. Listen
+   -------------------------------------------------------------------------- */
+.ulist ul, .olist ol { margin-left: 25px; }
+.ulist ul { list-style-type: square; }
+li { margin-bottom: 5px; }
+li > p { margin-bottom: 6px; }
+li::marker { color: var(--term-dim); }
+.ulist .ulist, .ulist .olist, .olist .olist, .olist .ulist { margin-top: 5px; margin-bottom: 0; }
+
+/* Checkliste */
+.checklist { list-style: none; margin-left: 10px; }
+.checklist li input[type="checkbox"] { accent-color: var(--term-green); margin-right: 6px; }
+
+/* Beschreibungsliste */
+.dlist dt {
+    color: var(--term-cyan);
+    font-weight: bold;
+    margin-top: 10px;
+}
+.dlist dd { margin-left: 25px; padding-left: 10px; border-left: 1px solid var(--term-dim); }
+
+/* Horizontale Beschreibungsliste ([horizontal]) */
+.hdlist > table { border-collapse: collapse; width: 100%; }
+.hdlist td.hdlist1 { color: var(--term-cyan); padding: 6px 16px 6px 0; vertical-align: top; white-space: nowrap; }
+.hdlist td.hdlist2 { padding: 6px 0; vertical-align: top; }
+
+/* Q&A-Liste ([qanda]) */
+.qlist ol { margin-left: 25px; }
+.qlist > ol > li > p:first-child em { color: var(--term-cyan); font-style: normal; }
+
+/* Callout-Liste */
+.colist { font-size: 0.9rem; }
+.colist > table { border-collapse: collapse; }
+.colist td:not([class]):first-child { padding: 2px 8px 2px 0; vertical-align: top; }
+.conum[data-value] {
+    display: inline-block;
+    width: 1.7em; height: 1.7em; line-height: 1.7em;
+    text-align: center;
+    background: var(--term-dim);
+    color: var(--term-green) !important;
+    border: 1px solid var(--term-green);
+    border-radius: 100px;
+    font-family: var(--font-stack);
+    font-size: 0.75em;
+    font-style: normal;
+    font-weight: bold;
+    text-shadow: none;
+}
+.conum[data-value]::after { content: attr(data-value); }
+.conum[data-value] + b { display: none; }
+pre .conum[data-value] { position: relative; top: -0.125em; }
+
+/* -----------------------------------------------------------------------------
+   9. Code: listingblock / literalblock
+   -------------------------------------------------------------------------- */
+pre {
+    background: rgba(0, 20, 10, 0.8);
+    border-left: 3px solid var(--term-dim);
+    color: var(--term-green);
+    font-family: var(--font-stack);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    padding: 12px 14px;
+    overflow-x: auto;
+    white-space: pre;
+    text-shadow: 0 0 3px rgba(51, 255, 102, 0.35);
+}
+pre code, pre code.hljs {
+    background: none;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+}
+
+/* Sprachlabel aus [source,go] */
+.listingblock pre code[data-lang]::before {
+    content: attr(data-lang);
+    display: block;
+    color: var(--term-dim);
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: none;
+    margin-bottom: 8px;
+}
+
+.listingblock.wrap pre, pre.nowrap { white-space: pre-wrap; word-wrap: break-word; }
+
+/* Highlight.js / Rouge / Pygments – Grundtöne aufs Terminal ziehen */
+pre .hljs-keyword, pre .k, pre .kd, pre .kn { color: var(--term-cyan); }
+pre .hljs-string, pre .s, pre .s1, pre .s2 { color: var(--term-amber); }
+pre .hljs-comment, pre .c, pre .c1, pre .cm { color: var(--term-dim); font-style: italic; }
+pre .hljs-number, pre .m, pre .mi, pre .mf { color: var(--term-amber); }
+pre .hljs-title, pre .nf, pre .nc { color: var(--term-cyan); }
+pre .err { color: var(--term-warn); background: none; }
+
+/* -----------------------------------------------------------------------------
+   10. Admonitions (NOTE, TIP, IMPORTANT, CAUTION, WARNING)
+   -------------------------------------------------------------------------- */
+.admonitionblock > table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--term-dim);
+    background: var(--panel-bg-soft);
+}
+.admonitionblock td.icon {
+    width: 120px;
+    padding: 12px;
+    text-align: center;
+    vertical-align: top;
+    border-right: 1px dashed var(--term-dim);
+}
+.admonitionblock td.icon .title {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    margin: 0;
+}
+.admonitionblock td.content { padding: 12px 16px; vertical-align: top; }
+.admonitionblock td.content > .title { color: var(--term-amber); }
+
+.admonitionblock.note      td.icon .title { color: var(--term-cyan); }
+.admonitionblock.tip       td.icon .title { color: var(--term-green); }
+.admonitionblock.important td.icon .title { color: var(--term-amber); }
+.admonitionblock.caution   td.icon .title { color: var(--term-amber); }
+.admonitionblock.warning   td.icon .title { color: var(--term-warn); }
+.admonitionblock.warning > table { border-color: var(--term-warn); }
+.admonitionblock.important > table { border-color: var(--term-amber); }
+
+/* Fallback für :icons: font — ohne Font-Awesome (kein CDN) reine ASCII-Marker */
+.admonitionblock td.icon [class^="fa icon-"] {
+    font-family: var(--font-stack);
+    font-style: normal;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+.admonitionblock td.icon .icon-note::before      { content: "[ i ] NOTE";      color: var(--term-cyan); }
+.admonitionblock td.icon .icon-tip::before       { content: "[ + ] TIP";       color: var(--term-green); }
+.admonitionblock td.icon .icon-important::before { content: "[ ! ] IMPORTANT"; color: var(--term-amber); }
+.admonitionblock td.icon .icon-caution::before   { content: "[ ! ] CAUTION";   color: var(--term-amber); }
+.admonitionblock td.icon .icon-warning::before   { content: "[/!\\] WARNING";  color: var(--term-warn); }
+
+/* -----------------------------------------------------------------------------
+   11. Zitate, Verse, Sidebar, Beispiel, Open Block
+   -------------------------------------------------------------------------- */
+.quoteblock { padding-left: 16px; border-left: 3px solid var(--term-dim); }
+.quoteblock blockquote { margin-bottom: 8px; }
+.quoteblock .attribution, .verseblock .attribution { color: var(--term-amber); font-size: 0.85rem; }
+.quoteblock cite, .verseblock cite { display: block; color: var(--term-dim); font-style: normal; }
+
+.verseblock pre.content, .verseblock > .content {
+    background: none;
+    border-left: 3px solid var(--term-dim);
+    padding: 0 0 0 16px;
+    white-space: pre-wrap;
+    font-size: 1rem;
+    text-shadow: var(--glow);
+}
+
+.sidebarblock {
+    border: 1px dashed var(--term-dim);
+    background: var(--panel-bg-soft);
+    padding: 16px;
+}
+.sidebarblock > .content > .title { color: var(--term-amber); }
+
+.exampleblock > .content {
+    border: 1px solid var(--term-dim);
+    background: rgba(0, 20, 10, 0.4);
+    padding: 16px;
+}
+
+.openblock > .content { padding-left: 14px; border-left: 1px solid var(--term-dim); }
+
+/* -----------------------------------------------------------------------------
+   12. Bilder & Medien
+   -------------------------------------------------------------------------- */
+.imageblock { text-align: center; }
+.imageblock .content { margin-bottom: 6px; }
+.imageblock img, .image img, img {
+    max-width: 100%;
+    height: auto;
+}
+.imageblock img, .image img {
+    border: 1px solid var(--term-dim);
+    background: rgba(0, 20, 10, 0.4);
+    padding: 4px;
+}
+.imageblock .title { text-align: left; }
+.imageblock.text-center, .text-center { text-align: center; }
+.imageblock.text-right { text-align: right; }
+.imageblock.left, .image.left { float: left; margin: 0 16px 16px 0; }
+.imageblock.right, .image.right { float: right; margin: 0 0 16px 16px; }
+.float-group::after { content: ""; display: table; clear: both; }
+
+/* Optional: Bilder in den Terminal-Look tönen — bei Bedarf einkommentieren
+.imageblock img { filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(3) contrast(1.1); }
+*/
+
+.videoblock iframe, .videoblock video, audio {
+    max-width: 100%;
+    border: 1px solid var(--term-dim);
+}
+
+/* -----------------------------------------------------------------------------
+   13. Tabellen
+   -------------------------------------------------------------------------- */
+table.tableblock {
+    border-collapse: collapse;
+    background: rgba(0, 20, 10, 0.35);
+    font-size: 0.95rem;
+}
+table.tableblock.stretch, table.stretch { width: 100%; }
+caption.title { text-align: left; padding-bottom: 6px; }
+
+th.tableblock, td.tableblock {
+    border: 1px solid var(--term-dim);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+}
+th.tableblock {
+    background: rgba(0, 255, 102, 0.1);
+    color: var(--term-cyan);
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+tfoot th.tableblock { text-transform: none; }
+p.tableblock { margin-bottom: 8px; }
+p.tableblock:last-child { margin-bottom: 0; }
+tbody tr:nth-child(even) { background: rgba(0, 255, 102, 0.03); }
+tbody tr:hover { background: rgba(0, 255, 102, 0.07); }
+
+/* Frame-/Grid-Varianten */
+table.frame-none { border: 0; }
+table.frame-ends th.tableblock, table.frame-ends td.tableblock { border-left: 0; border-right: 0; }
+table.frame-sides th.tableblock, table.frame-sides td.tableblock { border-top: 0; border-bottom: 0; }
+table.grid-none th.tableblock, table.grid-none td.tableblock { border: 0; }
+table.grid-rows th.tableblock, table.grid-rows td.tableblock { border-left: 0; border-right: 0; }
+table.grid-cols th.tableblock, table.grid-cols td.tableblock { border-top: 0; border-bottom: 0; }
+
+.halign-left { text-align: left; }
+.halign-center { text-align: center; }
+.halign-right { text-align: right; }
+.valign-top { vertical-align: top; }
+.valign-middle { vertical-align: middle; }
+.valign-bottom { vertical-align: bottom; }
+
+/* -----------------------------------------------------------------------------
+   14. Fußnoten
+   -------------------------------------------------------------------------- */
+sup.footnote a, sup.footnoteref a { color: var(--term-amber); border: 0; }
+#footnotes {
+    border-top: 1px dashed var(--term-dim);
+    margin-top: 30px;
+    padding-top: 12px;
+    font-size: 0.85rem;
+}
+#footnotes hr { display: none; }
+#footnotes .footnote { margin-bottom: 6px; color: var(--term-dim); }
+#footnotes .footnote a { color: var(--term-amber); }
+
+/* -----------------------------------------------------------------------------
+   15. Utilities / Sonstiges
+   -------------------------------------------------------------------------- */
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.text-justify { text-align: justify; }
+.nowrap { white-space: nowrap; }
+.hide { display: none; }
+.page-break { page-break-after: always; }
+
+:focus-visible { outline: 1px solid var(--term-cyan); outline-offset: 2px; }
+
+/* -----------------------------------------------------------------------------
+   16. Responsive
+   -------------------------------------------------------------------------- */
+@media screen and (max-width: 860px) {
+    body { font-size: 15px; }
+    #header { padding: 10px 14px 12px; }
+    #content, #footnotes, #footer > * { padding-left: 14px; padding-right: 14px; }
+    #preamble > .sectionbody, .sect1 { padding: 14px; }
+    .admonitionblock td.icon { width: 90px; padding: 10px 8px; font-size: 0.75rem; }
+    .dlist dd { margin-left: 12px; }
+    .ulist ul, .olist ol { margin-left: 18px; }
+}
+
+/* -----------------------------------------------------------------------------
+   17. Bewegung reduzieren / Druck
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+}
+
+@media print {
+    body::before { display: none; }
+    body, #footer { background: var(--bg-color); }
+    body, h1, h2, h3, h4, h5, h6, strong, em, pre { text-shadow: none; }
+    #preamble > .sectionbody, .sect1 { box-shadow: none; break-inside: avoid; }
+    .listingblock, .admonitionblock, table.tableblock, .imageblock { break-inside: avoid; }
+    #toc.toc2 { position: static; width: auto; height: auto; border: 1px solid var(--term-dim); }
+    body.toc2 { padding-left: 0; }
+    a { border-bottom: 0; }
+}

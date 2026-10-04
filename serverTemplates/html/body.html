@@ -1,0 +1,44 @@
+{{ template "header" . }}
+<body>
+<!-- Sichtbares Pi-Icon oben rechts -->
+<div id="pi-trigger" title="Gatekeeper">π</div>
+
+<!-- Verstecktes Mozarts Geist Menü -->
+<div id="secret-menu">
+    <h3>System Override</h3>
+    
+    <div class="dropdown-group">
+        <label for="layout-select">HTML Style:</label>
+        <select id="layout-select">
+            <option value="/css/adoc/defaultAsciidoctor.css">default Asciidoctor</option>
+            <option value="/css/adoc/retro-dark.css">Retro Dark</option>
+            <option value="/css/adoc/dunklesArchiv.css">Dunkles Archiv</option>
+            <option value="/css/adoc/maschinen-hell.css">Maschinen Hell</option>
+            <option value="/css/adoc/kSystemScan.css">System Scanlines</option>
+            <option value="/css/adoc/kSystemWayto.css">System Midtone</option>
+            <option value="/css/adoc/kSystemHell.css">System Heaven</option>
+        </select>
+    </div>
+
+    <div class="dropdown-group">
+        <label for="color-select">Syntax Theme:</label>
+        <select id="color-select">
+            <option value="/css/prism/prism_default.css">default</option>
+            <option value="/css/prism/prism_okaidia.css">okaidia</option>
+            <option value="/css/prism/prism_solarLight.css">solarLight</option>
+            <option value="/css/prism/prism_torwNight.css">torwNight</option>
+            <option value="/css/prism/prism_twiLight.css">twiLight</option>
+            <option value="/css/prism/prism_coy.css">coy</option>
+            <option value="/css/prism/prism_synthwave84.css">synthwave84</option>
+            <option value="/css/prism/prism-atom-dark.css">atom-dark</option>
+            <option value="/css/prism/prism-duotone-dark.css">duotone-dark</option>
+            <option value="/css/prism/prism-duotone-forest.css">duotone-forest</option>
+            <option value="/css/prism/prism-duotone-light.css">duotone-light</option>
+            <option value="/css/prism/prism-coldark-cold.css">coldark-cold</option>
+            <option value="/css/prism/prism-coldark-dark.css">coldark-dark</option>
+        </select>
+    </div>
+</div>
+  {{ .Text }}
+</body>
+{{ template "footer" . }}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>paste Text</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/fontawesome.min.css">
+  <link rel="stylesheet" href="css/solid.min.css">
+  <link rel="stylesheet" href="css/prism.css" id="themeSwitcher">
+  <script src="libs/handlebars.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="libs/superagent.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="libs/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="libs/prism.js" type="text/javascript" charset="utf-8"></script>
+  <script src="libs/codebedder.js" type="text/javascript" charset="utf-8"></script>
+  <script src="libs/feather.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="libs/loadAndTemplate.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/varDefaults.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/uiHandles.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/apiHandles.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body onload="initAll()">
+<div class="container" style="background-image: url('img/pasteLogo.png');background-repeat: no-repeat;">
+  <div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+  </div>
+  <div class="row">
+    <ul class="nav nav-pills justify-content-end">
+      <li class="nav-item">
+        <a class="nav-link bg-danger text-warning" aria-current="page" href="#" id="newDocumentBtn" onclick="newDocument()">New</a>        
+      </li>
+      <li class="nav-item">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" id="viewUrlTarget" disabled>
+          <span class="input-group-text" onclick="copyUrlToClipboard()" style="cursor: zoom-in;">
+            <i data-feather="copy"></i>
+          </span>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link bg-light text-danger" aria-current="page" href="#" id="saveUpdateBtn" onclick="saveUpdateDocument()">Save</a>        
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="" role="button" aria-expanded="false" id="themeBtn">dark</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#" onclick="themeSelector('dark')">dark</a></li>
+          <li><a class="dropdown-item" href="#" onclick="themeSelector('default')">default</a></li>
+          <li><a class="dropdown-item" href="#" onclick="themeSelector('tomorrowNight')">tomorrowNight</a></li>
+          <li><a class="dropdown-item" href="#" onclick="themeSelector('solarLight')">solarLight</a></li>
+          <!-- <li><a class="dropdown-item" href="#" onclick="themeSelector('twilight')">twilight</a></li> -->
+          <li><a class="dropdown-item" href="#" onclick="themeSelector('okaidia')">okaidia</a></li>
+          <!-- <li><a class="dropdown-item" href="#" onclick="themeSelector('coy')">coy</a></li> -->
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Load</a>
+        <ul class="dropdown-menu" id="documentLoadList"></ul>
+      </li>
+    </ul>
+  </div>
+  <!-- Nav Tab select -->
+  <div class="row">
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="markdownEdit-tab" data-bs-toggle="pill" data-bs-target="#markdownEdit" type="button" role="tab" aria-controls="markdownEdit" aria-selected="true" onclick="switchEditType('md')">Markdown</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="asciidocEdit-tab" data-bs-toggle="pill" data-bs-target="#asciidocEdit" type="button" role="tab" aria-controls="asciidocEdit" aria-selected="false" onclick="switchEditType('adoc')">Asciidoc</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="previewHTML-tab" data-bs-toggle="pill" data-bs-target="#previewHTML" type="button" role="tab" aria-controls="previewHTML" aria-selected="false" onclick="renderPreview()">Preview</button>
+      </li>
+    </ul>
+    <div class="tab-content" id="pills-tabContent">
+      <div class="tab-pane fade show active" id="markdownEdit" role="tabpanel" aria-labelledby="markdownEdit-tab" tabindex="0">
+        <div class="input-group mb-3">
+          <span class="input-group-text">Title</span>
+          <input type="text" class="form-control" id="markdownTitle" placeholder="Ohne Titel" aria-label="titel" aria-describedby="basic-addon1">
+          <span class="input-group-text" onclick="toggleSpellcheck('markdownEditor')" title="toggle spellcheck" style="cursor: help;">T</span>
+        </div>
+        <div>
+          <code-bedder id="markdownEditor" data-language="markdown" onhighlight="Prism.highlightElement(this)">
+            <!-- the default text came from fillMarkdownDefaultText() -->
+          </code-bedder>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="asciidocEdit" role="tabpanel" aria-labelledby="asciidocEdit-tab" tabindex="0">
+        <div class="input-group mb-3">
+          <span class="input-group-text">Title</span>
+          <input type="text" class="form-control" id="asciidocTitle" placeholder="Ohne Titel" aria-label="titel" aria-describedby="basic-addon1">
+          <span class="input-group-text" onclick="toggleSpellcheck('asciidocEditor')" title="toggle spellcheck" style="cursor: help;">T</span>
+        </div>
+        <code-bedder id="asciidocEditor" data-language="asciidoc" onhighlight="Prism.highlightElement(this)">
+          <!-- the default text came from fillAsciidocDefaultText -->
+        </code-bedder>
+      </div>
+      <div class="tab-pane fade" id="previewHTML" role="tabpanel" aria-labelledby="previewHTML-tab" tabindex="0">
+        <label for="previewOnlyArea" class="form-label" id="previewTitleTarget">HTML Preview</label>
+        <div id="previewContainerTarget"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let templateCache = {};
+  let state = {type:"md", mode:"new", theme:"dark"};
+
+  const initAll = () => {
+    getDocumentIndex();
+    feather.replace();
+    setTimeout( callTheDefaults, 400);
+  };
+
+  const readyLoad = (dElm) => {
+    console.log(dElm);
+  };
+</script>
+</body>
+</html>

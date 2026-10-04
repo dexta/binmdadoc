@@ -1,0 +1,90 @@
+{{ define "footer" }}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const piTrigger = document.getElementById('pi-trigger');
+    const secretMenu = document.getElementById('secret-menu');
+    
+    const layoutSelect = document.getElementById('layout-select');
+    const colorSelect = document.getElementById('color-select');
+   
+    let cList = document.getElementsByTagName('link');
+    let htmlStyle = null; let prismStyle = null;
+    for(let l=0,ll=cList.length; l < ll; l++) {
+    	if(cList[l].href.search(/prism/ig) >=0) {
+    	    prismStyle = cList[l];
+    	} else if(cList[l].href.search(/adoc/ig) >=0) {
+    	    htmlStyle = cList[l];
+    	}
+    }
+
+    layoutSelect.value = htmlStyle.href.replace(window.location.origin,"");
+    colorSelect.value = prismStyle.href.replace(window.location.origin,"");
+
+    // Menü umschalten
+    piTrigger.addEventListener('click', () => {
+        secretMenu.classList.toggle('active');
+    });
+
+    // Dropdown 1 ändert das html css  
+    layoutSelect.addEventListener('change', (event) => {
+        if(htmlStyle) {
+            htmlStyle.href = event.target.value;
+            localStorage.setItem('htmlTheme',event.target.value);
+        }
+    });
+
+    // Dropdown 2 ändert das Farb-CSS
+    colorSelect.addEventListener('change', (event) => {
+        if(prismStyle) {
+            prismStyle.href = event.target.value;
+            localStorage.setItem('prismTheme',event.target.value);
+            }
+    });
+
+//  #####################################################################
+//  Add funktion to the toc in diffrents css styles
+// ######################################################################
+
+    // 1. Das Asciidoctor TOC-Element suchen
+    const toc = document.getElementById('toc');
+    if (!toc) return; // Abbrechen, falls kein Inhaltsverzeichnis existiert
+
+    // 2. CSS-Klasse für unsere eigenen Styles hinzufügen
+    toc.classList.add('sidebar-menu');
+
+    // 3. Toggle-Button (Hamburger-Menü) erstellen
+    const toggleBtn = document.createElement('button');
+    toggleBtn.id = 'toc-toggle';
+    toggleBtn.innerHTML = '☰';
+    toggleBtn.setAttribute('aria-label', 'Inhaltsverzeichnis umschalten');
+    document.body.appendChild(toggleBtn);
+
+    // 4. Overlay für mobile Geräte erstellen (dunkelt den Hintergrund ab)
+    const overlay = document.createElement('div');
+    overlay.id = 'toc-overlay';
+    document.body.appendChild(overlay);
+
+    // 5. Toggle-Funktion definieren
+    const toggleMenu = () => {
+        toc.classList.toggle('is-open');
+        overlay.classList.toggle('is-open');
+    };
+
+    // 6. Event-Listener hinzufügen
+    toggleBtn.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
+
+    // 7. Menü schließen, wenn auf einem mobilen Gerät ein Link geklickt wird
+    const tocLinks = toc.querySelectorAll('a');
+    tocLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            // Nur auf kleinen Bildschirmen (unter 1024px) automatisch schließen
+            if (window.innerWidth < 1024) {
+                toggleMenu();
+            }
+        });
+    });
+});
+</script>
+</html>
+{{ end }}

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Mech Editor</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/fontawesome.min.css">
+	<link rel="stylesheet" href="css/solid.min.css">
+	<script src="js/libs/handlebars.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/libs/superagent.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/handlebarsHelper.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/dataLoadSave.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/dataWrangler.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/loadAndTemplate.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/uiAction.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body onload="preInit()">
+<div class="container">
+	<ul class="nav nav-tabs">
+		<li class="nav-item isAdmin" style="display: none;">
+	    <a class="nav-link mainMenuTab active"href="#" id="editMechsMenuItem" onclick="changeTab('editMechs')">Edit Mechs</a>
+	  </li>
+	  <li class="nav-item isUser" style="display: none;">
+	    <a class="nav-link mainMenuTab" href="#" id="chapterMechsMenuItem" onclick="changeTab('chapterMechs')">Chapter Mechs</a>
+	  </li>
+	  <li class="nav-item isUser" style="display: none;">
+	    <a class="nav-link mainMenuTab" href="#" id="chapterPlayerMenuItem" onclick="changeTab('chapterPlayer')">Player Mechs</a>
+	  </li>
+	  <li class="nav-item isUser" style="display: none;">
+	    <a class="nav-link mainMenuTab" href="#" id="chapterFightMenuItem" onclick="changeTab('chapterFight')">Chapter Fight</a>
+	  </li>
+	  <li class="nav-item flex-sm-fill text-sm-end">
+	    <a class="nav-link mainMenuTab text-danger" href="#" tabindex="-1" id="chapterUserMenuItem" onclick="changeTab('chapterUser')"><i class="fa-solid fa-user-tie"></i> User </a>
+	  </li>
+	</ul>
+	<div class="row" id="editMechsTab" style="display: none;">
+		<div class="row">
+			<div class="col-1">
+				<button class="btn btn-danger" onclick="doFiltering()">Filter</button>
+			</div>
+			<div class="col-5">
+				<div class="form-group">
+					<input class="form-control" type="text" name="filterString" id="filterString" value="tomin:100; aera:CBT,Clan,Jihad">
+				</div>
+			</div>
+		</div>
+		<div class="row" id="editMechsContainer"></div>
+	</div>
+
+	<div class="row" id="chapterMechsTab" style="display: none;">
+		<ul class="nav nav-tabs justify-content-end">
+  		<div class="col-2">
+  			<button id="saveChapterBtnStatus" class="btn btn-success" onclick="saveChapterMechs()">
+  				<i class="fa-solid fa-floppy-disk"></i>
+  				Save Mechs
+  			</button>
+  		</div>
+  		<div class="col-2">
+  			<button class="btn btn-primary" onclick="searchWindowHandle('toggle')"><i id="searchWindowIconStatus" class="fa-solid fa-down-long"></i></button>
+  			<button class="btn btn-secondary" onclick="searchWindowHandle(25)"><i class="fa-solid fa-temperature-quarter"></i></button>
+  			<button class="btn btn-secondary" onclick="searchWindowHandle(50)"><i class="fa-solid fa-temperature-half"></i></button>
+  			<button class="btn btn-secondary" onclick="searchWindowHandle(75)"><i class="fa-solid fa-temperature-full"></i></i></button>
+  		</div>
+  		<div class="col-4">
+				<div class="form-group">
+					<input class="form-control" type="text" name="searchString" id="searchString" value="name:cat">
+				</div>
+			</div>
+		  <div class="col-1">
+				<button class="btn btn-danger" onclick="doSearching()">Search</button>
+			</div>
+		  <li class="nav-item">
+		    <a class="nav-link chapterTabMenu active" id="aeraSelectTabCBT" href="#" onclick="selectChapterMechs('CBT')">Classic</a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link chapterTabMenu" id="aeraSelectTabISakt" href="#" onclick="selectChapterMechs('ISakt')">ISakt</a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link chapterTabMenu" id="aeraSelectTabClan" href="#" onclick="selectChapterMechs('Clan')">Clan</a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link chapterTabMenu" id="aeraSelectTabJihad" href="#" onclick="selectChapterMechs('Jihad')">Jihad</a>
+		  </li>
+		</ul>
+		<div class="row" id="chapterMechSearchContainer" style="height: 25vh;overflow: auto;display: none;"></div>
+		<hr />
+		<div class="row" id="chapterMechContainer"></div>
+	</div>
+
+	<div class="row" id="chapterFightTab" style="display: none;">
+		<ul class="nav nav-tabs justify-content-end">
+		  <li class="nav-item">
+		    <a class="nav-link chapterFightTabMenu active" id="aeraFightSelectTabCBT" href="#" onclick="selectFightMechs('CBT')">Classic</a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link chapterFightTabMenu" id="aeraFightSelectTabISakt" href="#" onclick="selectFightMechs('ISakt')">ISakt</a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link chapterFightTabMenu" id="aeraFightSelectTabClan" href="#" onclick="selectFightMechs('Clan')">Clan</a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link chapterFightTabMenu" id="aeraFightSelectTabJihad" href="#" onclick="selectFightMechs('Jihad')">Jihad</a>
+		  </li>
+		</ul>
+		<hr />
+		<div class="row" id="chapterFightBattleContainer"></div>
+		<div class="row" id="chapterFightContainer"></div>
+	</div>
+
+	<div class="row" id="chapterPlayerTab" style="display: none;">
+		<div class="row" id="chapterPlayerMechs"></div>
+		<div class="row">
+  		<div class="col-4">
+				<input class="form-control" type="text" name="searchPlayerMechString" id="searchPlayerMechString" value="name:cat">
+			</div>
+		  <div class="col-1">
+				<button class="btn btn-danger" onclick="doPlayerMech()">Search</button>
+			</div>
+		</div>
+		<hr />
+		<div class="row" id="chapterPlayerSearchMechs"></div>
+	</div>
+
+	<div class="row" id="chapterUserTab" style="display: none;">
+		<div class="row" id="chapterUserLoginBox">
+			<div class="col-4">
+		    <label for="chapterUserFormName" class="form-label">Username</label>
+		    <input type="text" class="form-control" name="username" id="chapterUserFormName" value="dexta">
+		  </div>
+		  <div class="col-4">
+		    <label for="chapterUserFormPass" class="form-label">Password</label>
+		    <input type="password" class="form-control" name="password" id="chapterUserFormPass" value="test1">
+		  </div>
+	   	<div class="col-2">
+		    <label for="chapterUserFormPass" class="form-label">Tu es !</label>
+		    <button class="btn btn-primary form-control" onclick="userLogin()">Log in</button>
+		  </div>
+	  </div>
+	  <div class="row" id="chapterUserInfoBox" style="display: none;"></div>
+	  <hr />
+	</div>
+
+</div>
+<script>
+	let templateCache = {};
+	let db = {mechs:[],chapter:[],player:[],user:{},deploy:[],skill:{}};
+
+	let state = {filterStr:"tomin:100; aera:CBT,Clan,Jihad",selTab:"chapterMechs",selAera:"CBT",selFightAera:"CBT",fightDeploy:-1};
+	let edit = {lastEditline:{},selectId:null,status:'noEdit',chapterChange:[],chapterFight:{'CBT':[],'ISakt':[],'Clan':[],'Jihad':[]}};
+
+	const preInit = () => {
+		getLoggedUser( n => {
+			initAll();
+		});
+	};
+
+	const initAll = () => {
+		preLoadJSON([
+				{path:"mechs/uniquelist",target:"mechs"},
+				{path:"user/chapter/mechs",target:"chapter"},
+				{path:"player/chapter/mechs",target:"player"},
+				{path:"json/BV_SkillTable.json",target:"skill"},
+			],
+			() => {
+				// let rawStr = getFilterString();
+				// renderTemplate('mechTable', {mechs:getFilteredData(rawStr)}, 'editMechsContainer');
+				doFiltering();
+				renderPlayerMechList();
+				renderFightMechList();
+			});
+	};
+</script>
+</body>
+</html>

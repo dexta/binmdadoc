@@ -1,0 +1,21 @@
+{
+  "name": "jsserver",
+  "version": "0.0.1",
+  "description": "echo markdown or asciidoctor to html",
+  "main": "app.js",
+  "scripts": {
+    "test": "nowayouthere.js"
+  },
+  "keywords": [
+    "markdown",
+    "asciidoctor"
+  ],
+  "author": "dexta.de",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "asciidoctor": "^3.0.4",
+    "body-parser": "^1.20.3",
+    "express": "^4.21.2",
+    "markdown-it": "^14.1.0"
+  }
+}

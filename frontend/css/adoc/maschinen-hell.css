@@ -1,0 +1,113 @@
+/* ==========================================================================
+   Computer Historyz: Maschinen-Instanzen Theme (Hell)
+   Basiert auf der schlanken Struktur von retro-dark.css
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-color: #f4f3ee;       /* Mattes Knochenweiß / Kieselgrau */
+  --text-color: #3a3f44;     /* Dunkles Schiefergrau */
+  --link-color: #246a73;     /* Ruhiges Seegrün/Teal */
+  --accent-color: #c96333;   /* Warmes Kupfer-Orange */
+  --border-color: #dcd9d1;   /* Staubige Trennlinie */
+  --code-bg: #e8e6df;        /* Abgesetzter Beige-Hintergrund */
+  --font-main: 'Charter', 'Bitstream Charter', 'Georgia', 'Palatino', serif;
+  --font-mono: 'Consolas', 'Fira Code', 'Monaco', monospace;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-main);
+  line-height: 1.6;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #24272a;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.3em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 2.2em;
+  color: #111314;
+  border-bottom: 2px solid var(--accent-color);
+}
+
+h2 {
+  font-size: 1.6em;
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: var(--accent-color);
+}
+
+code, kbd, pre {
+  font-family: var(--font-mono);
+  background-color: var(--code-bg);
+  color: var(--link-color);
+  border-radius: 3px;
+}
+
+code {
+  padding: 0.2em 0.4em;
+  font-size: 0.9em;
+}
+
+pre {
+  padding: 1rem;
+  overflow: auto;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent-color);
+}
+
+pre code {
+  background-color: transparent;
+  color: var(--text-color);
+  padding: 0;
+}
+
+blockquote, .quoteblock {
+  border-left: 4px solid var(--accent-color);
+  color: #61686e;
+  padding: 0.5em 1em;
+  margin: 1.5em 0;
+  font-style: italic;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+th, td {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  text-align: left;
+}
+
+th {
+  background-color: var(--code-bg);
+  color: #24272a;
+  font-weight: 600;
+}

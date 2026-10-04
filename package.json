@@ -1,0 +1,23 @@
+{
+  "name": "pastemark",
+  "version": "0.0.1",
+  "description": "frontend for markdown to html",
+  "main": "index.js",
+  "scripts": {
+    "test": "node nothingyoulookingfor.js"
+  },
+  "keywords": [
+    "bootstrap",
+    "handlebars",
+    "superagent"
+  ],
+  "author": "dexta.de",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "feather-icons": "^4.29.2",
+    "handlebars": "^4.7.8",
+    "highlight.js": "^11.10.0",
+    "superagent": "^10.1.1"
+  }
+}

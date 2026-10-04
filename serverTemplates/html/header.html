@@ -1,0 +1,250 @@
+{{ define "header" }}<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>{{ .Title }}</title>
+  {{ range .CSS }}
+  <link rel="stylesheet" href="{{ . }}">
+  {{ end }}
+  <script>
+      (function(){
+        const savedHtmlTheme = localStorage.getItem('htmlTheme') || '/css/adoc/retro-dark.css';
+        const savedPrismTheme = localStorage.getItem('prismTheme') || '/css/prism/prism_duotone-dark.css';
+        const cList = document.getElementsByTagName('link');
+        for(let l=0,ll=cList.length; l < ll; l++) {
+            if(cList[l].href.search(/prism/ig) >=0) {
+                cList[l].href = savedPrismTheme;
+            } else if(cList[l].href.search(/adoc/ig) >=0) {
+                cList[l].href = savedHtmlTheme;
+            }
+        }
+      })();
+  </script>
+  {{ range .JS }}
+  <script src="{{ . }}" type="text/javascript" charset="utf-8"></script>
+  {{ end }}
+<style>
+/* Das sichtbare Pi oben rechts */
+#pi-trigger {
+    position: fixed;
+    top: 15px;       /* Position: Oben */
+    right: 15px;     /* Position: Rechts */
+    font-size: 24px;
+    
+    /* Nutzt die Theme-Schriftart, fällt aber auf Serif zurück, damit das 'π' gut aussieht */
+    font-family: var(--font-main, "Times New Roman", Times, serif);
+    
+    /* Theme-Farben anwenden */
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color); /* Für besseren Kontrast hinzugefügt */
+    
+    padding: 5px 12px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    user-select: none;
+    z-index: 9999;
+    transition: all 0.2s ease;
+}
+
+#pi-trigger:hover {
+    /* Beim Hover die Farben invertieren oder die Akzentfarbe nutzen */
+    color: var(--bg-color);
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Das versteckte Menü darunter */
+#secret-menu {
+    display: none; 
+    position: fixed;
+    top: 65px;       /* Platziert das Menü direkt unter dem Pi */
+    right: 15px;
+    
+    /* Theme-Variablen für das Hauptmenü */
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    
+    /* Die Akzentfarbe übernimmt den 'Hacker'-Look des originalen Grüns */
+    border: 1px solid var(--accent-color); 
+    
+    /* Neutraler Schatten (CSS-Variablen in rgba() erfordern Umwege, daher generisch dunkel) */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+    
+    font-family: var(--font-main, 'Courier New', Courier, monospace);
+    z-index: 9998;
+    width: 250px;
+    border-radius: 4px;
+}
+
+#secret-menu.active {
+    display: block;
+}
+
+#secret-menu h3 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+    color: var(--accent-color); /* Überschrift in Akzentfarbe hervorheben */
+}
+
+.dropdown-group {
+    margin-bottom: 15px;
+}
+
+.dropdown-group label {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.dropdown-group select {
+    width: 100%;
+    
+    /* --code-bg eignet sich super als abgesetzter Hintergrund für Formularfelder */
+    background-color: var(--code-bg); 
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    
+    padding: 5px;
+    font-family: inherit;
+    border-radius: 3px;
+    transition: border-color 0.2s ease;
+}
+
+/* Optional: Hover/Focus-State für die Select-Boxen */
+.dropdown-group select:focus,
+.dropdown-group select:hover {
+    outline: none;
+    border-color: var(--accent-color);
+}
+/* --- Basis-Styles für das ausgelagerte TOC --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+#toc.sidebar-menu {
+    position: fixed;
+    top: 0;
+    left: -320px; /* Standardmäßig versteckt (Off-Canvas) */
+    width: 300px;
+    height: 100vh;
+    overflow-y: auto;
+    
+    /* Theme-Variablen anwenden */
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-main);
+    border-right: 1px solid var(--border-color);
+    
+    z-index: 1000;
+    padding: 20px;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    
+    /* Asciidoctor Standard-Styles überschreiben */
+    max-width: none !important; 
+    margin: 0 !important;
+}
+
+/* Zustand: Geöffnet (durch JS gesteuert) */
+#toc.sidebar-menu.is-open {
+    left: 0;
+}
+
+/* --- Links im TOC --- */
+#toc.sidebar-menu a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+#toc.sidebar-menu a:hover {
+    color: var(--accent-color);
+}
+
+/* --- Inline-Code in Überschriften --- */
+#toc.sidebar-menu code {
+    background-color: var(--code-bg);
+    border-radius: 4px;
+    padding: 0.1em 0.3em;
+    font-size: 0.9em;
+}
+
+/* --- Toggle Button --- */
+#toc-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    
+    /* Button nutzt Akzentfarbe und Hintergrundfarbe als Kontrast */
+    background-color: var(--accent-color);
+    color: var(--bg-color); 
+    
+    border: none;
+    font-size: 24px;
+    z-index: 1001;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+#toc-toggle:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+/* --- Hintergrund-Overlay (für Mobile) --- */
+#toc-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    
+    /* Nutzt die Textfarbe für die Abdunklung (passt sich so auch Dark/Light-Modes an) */
+    background-color: var(--text-color); 
+    opacity: 0;
+    visibility: hidden;
+    z-index: 999;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+/* Halbtransparent wenn geöffnet */
+#toc-overlay.is-open {
+    opacity: 0.4; 
+    visibility: visible;
+}
+
+/* --- Responsive Anpassungen (Desktop) --- */
+@media (min-width: 1024px) {
+    /* Menü ist auf großen Bildschirmen immer sichtbar */
+    #toc.sidebar-menu {
+        left: 0;
+    }
+    
+    /* Hauptinhalt (body) macht Platz für das Menü */
+    body {
+        padding-left: 320px !important;
+        transition: padding-left 0.3s ease;
+    }
+    
+    /* Button und Overlay auf dem Desktop verstecken */
+    #toc-toggle,
+    #toc-overlay {
+        display: none !important;
+    }
+}
+</style>
+</head>
+{{ end }}

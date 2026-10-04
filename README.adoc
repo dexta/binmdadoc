@@ -1,0 +1,101 @@
+= Markdown and AsciiDoc
+:author: björn / dexta
+:email: dexta.de@gmail.com
+:revnumber: 0.0.3
+:revdate: 11.06.2026
+
+// Hier werden die Badges definiert. Ersetze 'deine-gruppe' und 'dein-projekt' mit deinen GitLab-Pfaden!
+image:https://gitlab.com[link="https://gitlab.com", title="Build Status"]
+image:https://shields.io[link="https://gitlab.com", title="Latest Version"]
+image:https://shields.io[link="https://gnu.org", title="License: GPLv3"]
+
+This project started with the goal of bringing both text-based markup languages side by side. It stems from the need to quickly test, store, and potentially share texts with others.
+
+== The long journey of handling these with Go
+
+After hours of searching for a way to get AsciiDoc working with Golang, it became clear that there is no way around Asciidoctor and Ruby—the only full-featured implementation available. The idea was to build a Ruby web service that provides an HTML response for any text input.
+
+While this sounds easy to develop, it is hard to master without prior experience in non-Rails Ruby web services. Initial research showed that for years, developers have been satisfied with the JRuby version of Asciidoctor.
+
+Now, this project continues in a subfolder under the main project, restarting with a Node.js version of the initial Golang attempt. Unfortunately, the best implementation for Markdown also resides in the server-side JavaScript ecosystem.
+
+The current plan is as follows:
+* *Golang* will handle the frontend and save both the source and the final HTML file.
+* *Node.js* will act purely as a backend service to receive the source and return the HTML documents.
+* *Ruby* might replace `asciidoctor.js` at some point in the future.
+
+=== And the winner is: mdadoc
+
+The project is named after the mount point on a Docker Swarm node.
+
+After setting up a new DevOps environment, there is a clear need to test the infrastructure for future use, understand the running application, and monitor the resources required for the job.
+
+== To-Do List
+
+To integrate this properly into the environment and move past a single developer machine, a few adjustments are required. Moving to Docker is always a good starting point.
+
+=== Dockerfile
+Basic local testing for the Swarm stack.
+
+* [ ] Dockerfile for the Go server
+* [ ] Dockerfile for the JS server
+* [ ] Docker-compose template
+* [ ] Docker Swarm deployment configuration
+
+=== Startup Behavior Fixes
+All files and folders should be checked and created if needed. Template and frontend files must deploy safely.
+
+* [ ] Copy template files to the correct location
+* [ ] Copy frontend files to the correct location
+* [ ] Check storage paths
+** [ ] Documents directory
+** [ ] Configuration directory
+
+=== External Configuration
+Beside the container configuration, environment variables will cover other useful use cases.
+
+* [ ] Site title
+* [ ] Default site template
+* [ ] Default Markdown template
+* [ ] Default AsciiDoc template
+
+=== Frontend
+Keep it simple, stupid. Just bugfixing—no major improvements planned.
+
+=== Backend JS Echo Server
+Can be used as a standalone container for other services.
+
+=== Full Document Backend Server
+There is a good Asciidoctor container that can handle entire directories. Using this as a base, combined with some echo server logic, sounds like a solid plan.
+
+* [ ] Use the Asciidoctor Docker image as a base
+* [ ] Integrate it into the build pipeline
+* [ ] Implement a basic API
+
+
+=== Gitlab ci/cd build stuFF
+
+build tags a nice rabbithole to deploy with
+
+[source,yml]
+----
+build_and_push:
+  stage: deploy
+  image: docker:stable
+  services:
+    - docker:dind
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+    # Nutzt die Git-Tag-Variable (z.B. v1.0.0) als Container-Tag
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+  only:
+    - tags  # Dieser Job läuft NUR, wenn du ein Git-Tag erstellst
+
+----
+
+== License
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+See the `LICENSE` file for the full text.
