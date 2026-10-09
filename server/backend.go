@@ -45,12 +45,32 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 }
 
+func initEnv() {
+	docPath := filepath.Join(ExecPath, "docStore")
+	extPath := filepath.Join(ExecPath, "extStore")
+
+	if _, err := os.Stat(docPath); os.IsNotExist(err) {
+		os.MkdirAll(docPath, 0755)
+	}
+
+	if _, err := os.Stat(extPath); os.IsNotExist(err) {
+		os.MkdirAll(extPath, 0755)
+	}
+
+	jsonStorePath := filepath.Join(docPath, "documentStore.json")
+	if _, err := os.Stat(jsonStorePath); os.IsNotExist(err) {
+		os.WriteFile(jsonStorePath, []byte("[]"), 0644)
+	}
+}
+
 func StartRouter() {
 	// TODO make it confi
 	ExecPath = "./"
 	// ex, err := os.Executable()
 	// check(err)
 	// ExecPath = filepath.Dir(ex)
+
+	initEnv()
 
 
 	var wait time.Duration
@@ -77,6 +97,10 @@ func StartRouter() {
 	router.HandleFunc("/api/doc/by/id/{docId}", GetDocumentById).Methods("GET")
 	
 	router.HandleFunc("/view/{docId}", HTMLById).Methods("GET")
+
+	router.HandleFunc("/api/export/{docId}", ExportHTMLBundle).Methods("GET")
+
+	router.HandleFunc("/api/export/zip/{docId}", ExportZipBundle).Methods("GET")
 
 	spa := spaHandler{staticPath: "frontend", indexPath: "index.html"}
 	router.PathPrefix("/").Handler(spa)

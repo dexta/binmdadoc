@@ -48,6 +48,13 @@
         <a class="nav-link bg-light text-danger" aria-current="page" href="#" id="saveUpdateBtn" onclick="saveUpdateDocument()">Save</a>        
       </li>
       <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle text-info disabled" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" id="exportBtn">Export</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#" onclick="exportDocument('html')">Export as HTML</a></li>
+          <li><a class="dropdown-item" href="#" onclick="exportDocument('zip')">Export as ZIP</a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="" role="button" aria-expanded="false" id="themeBtn">dark</a>
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" href="#" onclick="themeSelector('dark')">dark</a></li>
