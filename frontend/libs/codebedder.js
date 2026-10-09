@@ -56,10 +56,10 @@ code-bedder pre {
 
 code-bedder code,
 code-bedder textarea {
-  outline: 0;
-  font-family: var(--code-bedder-font-family);
-  font-size: 1em;
-  line-height: 1.5;
+  outline: 0 !important;
+  font-family: var(--code-bedder-font-family) !important;
+  font-size: 1em !important;
+  line-height: 1.5 !important;
 }
 
 code-bedder code {
@@ -73,14 +73,16 @@ code-bedder textarea {
   bottom: 0;
   left: 4.5px;
   resize: none;
-  margin: 0;
-  margin-bottom: -2px; /* fixes scrollbar when using auto height */
-  padding: 0;
+  margin: 0 !important;
+  margin-bottom: -2px !important; /* fixes scrollbar when using auto height */
+  padding: 0 !important;
   background: transparent;
   color: transparent;
-  white-space: pre;
+  white-space: pre !important;
   caret-color: var(--code-bedder-caret-color);
   border: none;
+  word-wrap: normal !important;
+  word-break: normal !important;
 }
 
 code-bedder textarea::selection {
@@ -157,6 +159,7 @@ code-bedder pre::-webkit-scrollbar-thumb:hover {
       this.removeAttribute('placeholder');
 
       this.textarea.setAttribute('spellcheck', false);
+      this.textarea.setAttribute('wrap', 'off');
       this.textarea.value = codeContent;
       this.appendChild(this.textarea);
 
