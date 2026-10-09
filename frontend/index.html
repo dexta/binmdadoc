@@ -38,10 +38,10 @@
       </li>
       <li class="nav-item">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" id="viewUrlTarget" disabled>
-          <span class="input-group-text" onclick="copyUrlToClipboard()" style="cursor: zoom-in;">
+          <input type="text" class="form-control" id="viewUrlTarget" aria-label="Document URL" disabled>
+          <button type="button" class="input-group-text btn btn-outline-secondary" onclick="copyUrlToClipboard()" aria-label="Copy URL to clipboard" title="Copy URL">
             <i data-feather="copy"></i>
-          </span>
+          </button>
         </div>
       </li>
       <li class="nav-item">
@@ -83,7 +83,7 @@
         <div class="input-group mb-3">
           <span class="input-group-text">Title</span>
           <input type="text" class="form-control" id="markdownTitle" placeholder="Ohne Titel" aria-label="titel" aria-describedby="basic-addon1">
-          <span class="input-group-text" onclick="toggleSpellcheck('markdownEditor')" title="toggle spellcheck" style="cursor: help;">T</span>
+          <button type="button" class="input-group-text btn btn-outline-secondary" onclick="toggleSpellcheck('markdownEditor')" aria-label="Toggle spellcheck" title="Toggle spellcheck">T</button>
         </div>
         <div>
           <code-bedder id="markdownEditor" data-language="markdown" onhighlight="Prism.highlightElement(this)">
@@ -95,7 +95,7 @@
         <div class="input-group mb-3">
           <span class="input-group-text">Title</span>
           <input type="text" class="form-control" id="asciidocTitle" placeholder="Ohne Titel" aria-label="titel" aria-describedby="basic-addon1">
-          <span class="input-group-text" onclick="toggleSpellcheck('asciidocEditor')" title="toggle spellcheck" style="cursor: help;">T</span>
+          <button type="button" class="input-group-text btn btn-outline-secondary" onclick="toggleSpellcheck('asciidocEditor')" aria-label="Toggle spellcheck" title="Toggle spellcheck">T</button>
         </div>
         <code-bedder id="asciidocEditor" data-language="asciidoc" onhighlight="Prism.highlightElement(this)">
           <!-- the default text came from fillAsciidocDefaultText -->

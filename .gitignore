@@ -1,4 +1,4 @@
 node_modules/*
 /*/node_modules/*
 docStore/*
-extStore/*
+extStore/*server.log
