@@ -84,3 +84,22 @@ const getDocumentIndex = () => {
     console.dir(err.response);
   });
 };
+const exportDocument = (format) => {
+  if (!state.md5) {
+    console.error("No document ID available for export.");
+    return;
+  }
+  let exportUrl = `/api/export/${state.md5}`;
+  if (format === 'zip') {
+    exportUrl = `/api/export/zip/${state.md5}`;
+  }
+
+  // Create an invisible link to trigger the download
+  const link = document.createElement("a");
+  link.style.display = "none";
+  link.href = exportUrl;
+  link.setAttribute("download", ""); // Let the backend decide the filename
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};

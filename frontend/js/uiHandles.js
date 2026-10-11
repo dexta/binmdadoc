@@ -107,9 +107,12 @@ const newDocument = () => {
 
 const saveUpdateBtnToggler = () => {
   let usButton = document.querySelector("#saveUpdateBtn");
+  let exportBtn = document.querySelector("#exportBtn");
   if(state.mode==="new") {
     usButton.text = "Save";
+    if (exportBtn) exportBtn.classList.add("disabled");
   } else if(state.mode==="update") {
     usButton.text = "Update";
+    if (exportBtn && state.md5) exportBtn.classList.remove("disabled");
   }
 };
