@@ -2,8 +2,8 @@ package serv
 
 import (
 	"context"
-  "flag"
 	"encoding/json"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -22,9 +22,9 @@ type spaHandler struct {
 }
 
 func check(e error) {
-  if e != nil {
-    panic(e)
-  }
+	if e != nil {
+		panic(e)
+	}
 }
 
 func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +38,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
+		return
 	}
 
 	// otherwise, use http.FileServer to serve the static file
@@ -75,10 +75,9 @@ func StartRouter() {
 
 	initEnv()
 
-
 	var wait time.Duration
-    flag.DurationVar(&wait, "graceful-timeout", time.Second * 15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
-    flag.Parse()
+	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
+	flag.Parse()
 
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -88,17 +87,17 @@ func StartRouter() {
 	})
 
 	router.HandleFunc("/api/echo/markdown", ProxyMarkdown).Methods("POST")
-	
+
 	router.HandleFunc("/api/echo/asciidoc", ProxyAsciidoc).Methods("POST")
-	
+
 	router.HandleFunc("/api/add/doc", NewFileWriter).Methods("POST")
-	
+
 	router.HandleFunc("/api/update/doc", UpdateFileWirter).Methods("POST")
-	
+
 	router.HandleFunc("/api/doc/index", GetDocumentIndex).Methods("GET")
-	
+
 	router.HandleFunc("/api/doc/by/id/{docId}", GetDocumentById).Methods("GET")
-	
+
 	router.HandleFunc("/view/{docId}", HTMLById).Methods("GET")
 
 	router.HandleFunc("/api/export/{docId}", ExportHTMLBundle).Methods("GET")
@@ -109,29 +108,29 @@ func StartRouter() {
 	router.PathPrefix("/").Handler(spa)
 
 	srv := &http.Server{
-		Addr:    "0.0.0.0:8000",
+		Addr: "0.0.0.0:8000",
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 		IdleTimeout:  time.Second * 60,
-        Handler: router,
+		Handler:      router,
 	}
 
 	go func() {
-	    if err := srv.ListenAndServe(); err != nil {
-	        log.Println(err)
-	    }
-    }()
+		if err := srv.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
 
-    c := make(chan os.Signal, 1)
-    signal.Notify(c, os.Interrupt)
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
 
-    // Block until we receive our signal.
-    <-c
+	// Block until we receive our signal.
+	<-c
 
-    ctx, cancel := context.WithTimeout(context.Background(), wait)
-    defer cancel()
-    srv.Shutdown(ctx)
-    log.Println("shutting down")
-    os.Exit(0)
+	ctx, cancel := context.WithTimeout(context.Background(), wait)
+	defer cancel()
+	srv.Shutdown(ctx)
+	log.Println("shutting down")
+	os.Exit(0)
 }

@@ -1,11 +1,11 @@
 package main
 
 import (
-  "dexta/pastemark/server"
-  "fmt"
+	"dexta/pastemark/server"
+	"fmt"
 )
 
 func main() {
-  fmt.Println("server started")
-  serv.StartRouter()
+	fmt.Println("server started")
+	serv.StartRouter()
 }
