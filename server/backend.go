@@ -65,7 +65,10 @@ func initEnv() {
 
 func StartRouter() {
 	// TODO make it confi
-	ExecPath = "./"
+	ExecPath = os.Getenv("PASTEMARK_EXEC_PATH")
+	if ExecPath == "" {
+		ExecPath = "./"
+	}
 	// ex, err := os.Executable()
 	// check(err)
 	// ExecPath = filepath.Dir(ex)
