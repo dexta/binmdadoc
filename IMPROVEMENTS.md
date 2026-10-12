@@ -5,25 +5,23 @@ This document outlines a list of potential improvements for the current state of
 ## 1. Docker & Infrastructure (DevOps)
 The `README.adoc` mentions a transition to Docker Swarm and CI/CD pipelines, which are currently missing in the repository.
 
-- [ ] **Create a Dockerfile for the Go Backend**
-  - Use a multi-stage build (`golang:1.21-alpine` for build, `alpine` for runtime) to keep the image size small.
-- [ ] **Create a Dockerfile for the Node.js Server**
-  - Base on `node:20-alpine` (or similar), copy `package.json`, install via `pnpm`, and run `app.js`.
-- [ ] **Create `docker-compose.yml`**
+- [x] **Create a Dockerfile for the Go Backend**
+  - Use a multi-stage build (`debian:trixie-slim` for build and runtime) to keep the image size small and install Go directly from source.
+- [x] **Create a Dockerfile for the Node.js Server**
+  - Base on `debian:trixie-slim`, install Node.js 20 LTS via NodeSource, copy `package.json`, install via `pnpm`, and run `app.js`.
+- [x] **Create `docker-compose.yml`**
   - Orchestrate both the Go backend and the Node.js service together. Include volume mounts for `docStore` and `extStore`.
 - [ ] **Implement GitLab CI/CD (or GitHub Actions)**
   - Add testing stages (running `run_tests.sh`) and build/push stages for the Docker images.
-- [ ] **Add a `.dockerignore` file**
+- [x] **Add a `.dockerignore` file**
   - Ignore `node_modules`, `docStore`, `extStore`, and temporary test artifacts.
 
 ## 2. Go Backend
 The Go backend (`main.go`, `server/*.go`) has some hardcoded paths and error handling issues.
 
-- [ ] **Refactor Configuration & Environment Variables**
-  - The `TODO make it confi` in `backend.go` should be resolved. Use a configuration struct or an environment variable parser (like `viper` or standard `os.Getenv`) to set:
-    - Host and Port bindings
-    - Document store paths (`docStore`, `extStore`)
-    - Node.js API endpoint URL (currently hardcoded to `http://localhost:8080`)
+- [x] **Refactor Configuration & Environment Variables** *(Partially Done)*
+  - Node.js API endpoint URL is now configurable via `CONVERTER_URL`.
+  - *Pending:* The `TODO make it confi` in `backend.go` should be resolved for Host and Port bindings and Document store paths (`docStore`, `extStore`).
 - [ ] **Improve Error Handling and Logging**
   - `fmt.Println` and `fmt.Errorf` without returns are used in many places (e.g., `fmt.Errorf("Error %s", err)` in `markFunc.go`). Switch to a structured logger (like `slog` or `logrus`) and ensure HTTP handlers return proper error codes (`http.Error()`) instead of failing silently or proceeding with nil values.
 - [ ] **Race Condition in JSON Store**

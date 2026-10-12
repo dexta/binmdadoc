@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  node-server:
+    build:
+      context: ./jsServer
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    networks:
+      - pastemark-network
+
+  go-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - CONVERTER_URL=http://node-server:8080
+      - PASTEMARK_EXEC_PATH=/app
+    volumes:
+      - docstore-vol:/app/docStore
+      - extstore-vol:/app/extStore
+    depends_on:
+      - node-server
+    restart: unless-stopped
+    networks:
+      - pastemark-network
+
+networks:
+  pastemark-network:
+    driver: bridge
+
+volumes:
+  docstore-vol:
+  extstore-vol:
