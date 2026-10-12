@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -27,6 +28,14 @@ func getJSONrequest(r *http.Request) JsPostText {
 	return jsstr
 }
 
+func getConverterURL() string {
+	url := os.Getenv("CONVERTER_URL")
+	if url == "" {
+		return "http://localhost:8080"
+	}
+	return url
+}
+
 func ProxyMarkdown(w http.ResponseWriter, r *http.Request) {
 
 	textValues := getJSONrequest(r)
@@ -38,7 +47,7 @@ func ProxyMarkdown(w http.ResponseWriter, r *http.Request) {
 
 	sendBuf := bytes.NewBuffer([]byte(jsonData))
 	hClient := http.Client{Timeout: time.Duration(1) * time.Second}
-	resp, err := hClient.Post("http://localhost:8080/api/echo/markdown", "application/json", sendBuf)
+	resp, err := hClient.Post(getConverterURL()+"/api/echo/markdown", "application/json", sendBuf)
 	if err != nil {
 		fmt.Errorf("Error %s", err)
 		return
@@ -61,7 +70,7 @@ func ProxyAsciidoc(w http.ResponseWriter, r *http.Request) {
 
 	sendBuf := bytes.NewBuffer([]byte(jsonData))
 	hClient := http.Client{Timeout: time.Duration(1) * time.Second}
-	resp, err := hClient.Post("http://localhost:8080/api/echo/asciidoc", "application/json", sendBuf)
+	resp, err := hClient.Post(getConverterURL()+"/api/echo/asciidoc", "application/json", sendBuf)
 	if err != nil {
 		fmt.Errorf("Error %s", err)
 		return

@@ -34,7 +34,7 @@ func Convert2HTML(jsstr JsPostText) {
 
 	sendBuf := bytes.NewBuffer([]byte(jsonData))
 	hClient := http.Client{Timeout: time.Duration(1) * time.Second}
-	resp, err := hClient.Post("http://localhost:8080/api/echo/"+docType, "application/json", sendBuf)
+	resp, err := hClient.Post(getConverterURL()+"/api/echo/"+docType, "application/json", sendBuf)
 	if err != nil {
 		fmt.Errorf("Error %s", err)
 		return
