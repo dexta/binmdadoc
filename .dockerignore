@@ -1,0 +1,9 @@
+node_modules
+jsServer/node_modules
+docStore
+extStore
+tests/
+.git
+.gitignore
+README.adoc
+.Jules
